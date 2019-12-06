@@ -4,7 +4,7 @@ import ChaoticController from './app/controllers/ChaoticController';
 
 const routes = new Router();
 
-routes.get('/api/v2/order-by-status', ChaoticController.orderByStatus);
+routes.get('/api/v2/order-by-status', ChaoticController.getOrdenedByStatus);
 
 routes.get('/api/v2/order-total/:status', ChaoticController.getTotalByStatus);
 
