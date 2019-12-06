@@ -46,7 +46,9 @@ A chamada é do tipo HTTP:
 - Localhost:
   BASE_URL: `http://localhost:5000/api/organize/event`
 
-> Obs: a porta pode ser configurada no arquivo server.js
+> Obs: A porta pode ser configurada no arquivo server.js
+
+> Obs: Documentação com apidoc na pasta public/apidoc e coverage com  tests na pasta tests, para visualizar execute o arquivo index.html no navegador
 
 ## Endpoints
 
