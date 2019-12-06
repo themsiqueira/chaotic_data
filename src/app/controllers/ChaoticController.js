@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 
 class ChaoticController {
-  async getJsonFileToJson(){
+  async getJsonFileToJson() {
     const filePath = path.join(
       __dirname,
       '..',
@@ -19,15 +19,16 @@ class ChaoticController {
   }
 
   async getOrdenedByStatus(req, res) {
-    const toOrder = this.getJsonFileToJson();
+    const chaoticController = new ChaoticController();
 
-    const data = this.orderByStatus(toOrder);
+    const toOrder = await chaoticController.getJsonFileToJson();
+
+    const data = chaoticController.orderByStatus(toOrder);
 
     return res.json({ message: 'Sucess to get data', data });
   }
 
   orderByStatus(toOrder) {
-
     const Pending = [];
     const Paid = [];
     const Cancelled = [];
@@ -56,7 +57,7 @@ class ChaoticController {
       }
     });
 
-    const result = {Pending, Paid, Cancelled, Refunded, Expired};
+    const result = { Pending, Paid, Cancelled, Refunded, Expired };
 
     return result;
   }
@@ -64,64 +65,71 @@ class ChaoticController {
   async getTotalByStatus(req, res) {
     const { status } = req.params;
 
-    const toCalc = this.getJsonFileToJson();
+    const chaoticController = new ChaoticController();
 
-    const totalAmount = calcTotalByStatus(toCalc, status);
+    const toCalc = await chaoticController.getJsonFileToJson();
 
-    const data = {status, totalAmount}
+    const totalAmount = chaoticController.calcTotalByStatus(toCalc, status);
 
-    return res.json({ message: 'Sucess to get total by status', data });
+    const data = { status, totalAmount };
 
+    return res.json({
+      message: `Sucess to get total by status ${status}`,
+      data,
+    });
   }
 
   calcTotalByStatus(toCalc, status) {
+    const toCalcFiltered = toCalc.filter(item => item.status === status);
 
-    const toCalcFiltered = toCalc.filter(item => {
-      if (item.status === status)
-        return items;
-    });
+    const totalAmountByAllOrders = [];
 
-    toCalcFiltered.forEach((item, index) => {
+    toCalcFiltered.forEach(item => {
       const totalAmountByOrder = item.order_items.reduce(
-        (a, b) => a.amount + b.amount,
+        (a, b) => a + b.amount,
         0
       );
-      this[index].totalAmountByOrder = totalAmountByOrder;
+      totalAmountByAllOrders.push(parseInt(totalAmountByOrder, 10));
     });
 
-    const totalByStatus = toCalcFiltered.reduce(
-      (a, b) => a.totalAmountByOrder + b.totalAmountByOrder,
-      0
-    );
+    const totalByStatus = totalAmountByAllOrders.reduce((a, b) => a + b, 0);
 
     return totalByStatus;
   }
 
   async orderByMajorValue(req, res) {
-    const toCalc = this.getJsonFileToJson();
+    const chaoticController = new ChaoticController();
 
-    const Pending = this.calcTotalByStatus(toCalc, 'Pending');
-    const Paid = this.calcTotalByStatus(toCalc, 'Paid');
-    const Cancelled = this.calcTotalByStatus(toCalc, 'Cancelled');
-    const Refunded = this.calcTotalByStatus(toCalc, 'Refunded');
-    const Expired = this.calcTotalByStatus(toCalc, 'Expired');;
+    const toCalc = await chaoticController.getJsonFileToJson();
 
-    const result = [ {
-      status: 'Pending',
-      totalAmout: Pending
-    },{
-      status: 'Paid',
-      totalAmout: Paid
-    },{
-      status: 'Cancelled',
-      totalAmout: Cancelled
-    },{
-      status: 'Refunded',
-      totalAmout: Refunded
-    },{
-      status: 'Expired',
-      totalAmout: Expired
-    }];
+    const Pending = chaoticController.calcTotalByStatus(toCalc, 'Pending');
+    const Paid = chaoticController.calcTotalByStatus(toCalc, 'Paid');
+    const Cancelled = chaoticController.calcTotalByStatus(toCalc, 'Cancelled');
+    const Refunded = chaoticController.calcTotalByStatus(toCalc, 'Refunded');
+    const Expired = chaoticController.calcTotalByStatus(toCalc, 'Expired');
+
+    const result = [
+      {
+        status: 'Pending',
+        totalAmout: Pending,
+      },
+      {
+        status: 'Paid',
+        totalAmout: Paid,
+      },
+      {
+        status: 'Cancelled',
+        totalAmout: Cancelled,
+      },
+      {
+        status: 'Refunded',
+        totalAmout: Refunded,
+      },
+      {
+        status: 'Expired',
+        totalAmout: Expired,
+      },
+    ];
 
     result.sort((x, y) => {
       if (x.totalAmout > y.totalAmout) {
@@ -136,12 +144,7 @@ class ChaoticController {
     return res.json({ message: 'Sucess to get data', data: result });
   }
 
-  async groupByCountry(req, res) {
-
-
-    return
-  }
-
+  async groupByCountry(req, res) {}
 }
 
 export default new ChaoticController();
