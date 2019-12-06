@@ -144,7 +144,28 @@ class ChaoticController {
     return res.json({ message: 'Sucess to get data', data: result });
   }
 
-  async groupByCountry(req, res) {}
+  async groupByCountry(req, res) {
+    const chaoticController = new ChaoticController();
+    const toGetCountries = await chaoticController.getJsonFileToJson();
+
+    const countriesToFilter = [];
+
+    toGetCountries.forEach(item => {
+      countriesToFilter.push(item.shipping.country.name);
+    });
+
+    const countries = new Set(countriesToFilter);
+
+    const result = {};
+
+    countries.forEach(country => {
+      result[country] = toGetCountries.filter(
+        transaction => transaction.shipping.country.name === country
+      );
+    });
+
+    return res.json({ message: 'Sucess to get data by country', data: result });
+  }
 }
 
 export default new ChaoticController();
